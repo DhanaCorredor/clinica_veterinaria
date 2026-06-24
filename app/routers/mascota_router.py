@@ -5,6 +5,7 @@ from app.controllers.mascota_controller import MascotaController
 from app.database.db_connection import get_db
 from app.schema_validator.mascota_validator import (
     MascotaCreateValidator,
+    MascotaUpdateValidator,
     MascotaResponseValidator,
 )
 
@@ -25,3 +26,45 @@ def create_mascota(
     return MascotaController.create_mascota(
         db=db,
         mascota_data=mascota_data)
+
+
+@router.get(
+    "/",
+    response_model=list[MascotaResponseValidator],
+)
+def get_mascotas(db: Session = Depends(get_db)):
+    return MascotaController.get_mascotas(db=db)
+
+
+@router.get(
+    "/{mascota_id}",
+    response_model=MascotaResponseValidator,
+)
+def get_mascota(
+        mascota_id: int,
+        db: Session = Depends(get_db)):
+    return MascotaController.get_mascota(db=db, mascota_id=mascota_id)
+
+
+@router.put(
+    "/{mascota_id}",
+    response_model=MascotaResponseValidator,
+)
+def update_mascota(
+        mascota_id: int,
+        mascota_data: MascotaUpdateValidator,
+        db: Session = Depends(get_db)):
+    return MascotaController.update_mascota(
+        db=db,
+        mascota_id=mascota_id,
+        mascota_data=mascota_data)
+
+
+@router.delete(
+    "/{mascota_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_mascota(
+        mascota_id: int,
+        db: Session = Depends(get_db)):
+    MascotaController.delete_mascota(db=db, mascota_id=mascota_id)

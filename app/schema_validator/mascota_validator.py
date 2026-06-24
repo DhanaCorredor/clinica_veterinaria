@@ -14,6 +14,10 @@ class MascotaCreateValidator(MascotaBaseValidator):
     pass
 
 
+class MascotaUpdateValidator(MascotaBaseValidator):
+    pass
+
+
 class MascotaResponseValidator(MascotaBaseValidator):
     id: int
 
