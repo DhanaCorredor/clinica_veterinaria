@@ -196,9 +196,9 @@ Base prefix per entity and current implementation status.
 | Veterinarians | `/veterinarios` | `POST /` | GET, GET/{id}, PUT, DELETE |
 | Treatments | `/tratamientos` | `POST /` | GET, GET/{id}, PUT, DELETE |
 | Pets | `/mascotas` | `POST /` | GET, GET/{id}, PUT, DELETE |
-| Clinical histories | `/historias-clinicas` | `POST /` | GET, GET/{id}, PUT, DELETE |
+| Clinical histories | `/historias_clinicas` | `POST /` | GET, GET/{id}, PUT, DELETE |
 | Appointments | `/citas` | `POST /` | GET, GET/{id}, PUT, DELETE |
-| Pet–Treatment | `/mascotas-tratamientos` | `POST /` | GET, GET/{id}, PUT, DELETE |
+| Pet–Treatment | `/mascota_tratamiento` | `POST /` | GET, GET/{id}, PUT, DELETE |
 
 > ⚠️ Currently **only the create operation (POST)** is implemented for each entity. The rest of the CRUD is pending (see `PLAN_DE_TRABAJO.md`).
 
