@@ -2,3 +2,7 @@
 .env
 .idea/
 __pycache__/
+
+# Claude Code (no subir nada relacionado con Claude)
+.claude/
+CLAUDE.md
