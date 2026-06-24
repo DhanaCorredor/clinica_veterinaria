@@ -1,217 +1,217 @@
-# 🐾 API Clínica Veterinaria
+# 🐾 Veterinary Clinic API
 
-> API REST para la gestión de una clínica veterinaria: propietarios, mascotas, veterinarios, citas, tratamientos e historias clínicas.
-> Proyecto **Factoría F5**.
+> REST API for managing a veterinary clinic: owners, pets, veterinarians, appointments, treatments and clinical histories.
+> **Factoría F5** project.
 
-📖 **Wiki completa en Notion:** [API Clínica Veterinaria](https://dhanacorredor.notion.site/API-Cl-nica-Veterinaria-38954980d234801b8a4ffd25266a69fd)
-
----
-
-## 1. Descripción general
-
-Esta API permite gestionar la operativa de una clínica veterinaria. Centraliza la información de los **propietarios** y sus **mascotas**, el personal (**veterinarios**), los **tratamientos** ofrecidos, las **citas** agendadas, la **historia clínica** de cada mascota y la relación entre mascotas y los tratamientos aplicados.
-
-Está construida como una **API REST** con documentación interactiva automática (Swagger / OpenAPI).
+📖 **Full wiki on Notion:** [Veterinary Clinic API](https://dhanacorredor.notion.site/API-Cl-nica-Veterinaria-38954980d234801b8a4ffd25266a69fd)
 
 ---
 
-## 2. Stack tecnológico
+## 1. Overview
 
-| Componente | Tecnología |
-|------------|------------|
-| Lenguaje | Python 3.10+ |
-| Framework web | FastAPI |
-| Servidor ASGI | Uvicorn |
-| ORM | SQLAlchemy 2.0 (estilo `Mapped` / `mapped_column`) |
-| Base de datos | PostgreSQL |
-| Driver BD | psycopg (binary) |
-| Validación | Pydantic + pydantic-settings |
-| Configuración | Variables de entorno vía `.env` |
+This API manages the day-to-day operations of a veterinary clinic. It centralizes information about **owners** and their **pets**, the staff (**veterinarians**), the **treatments** offered, scheduled **appointments**, each pet's **clinical history**, and the relationship between pets and the treatments applied to them.
+
+It is built as a **REST API** with automatic interactive documentation (Swagger / OpenAPI).
 
 ---
 
-## 3. Arquitectura
+## 2. Tech stack
 
-El proyecto sigue una **arquitectura por capas** con responsabilidad única por clase. El flujo de una petición es:
+| Component | Technology |
+|-----------|------------|
+| Language | Python 3.10+ |
+| Web framework | FastAPI |
+| ASGI server | Uvicorn |
+| ORM | SQLAlchemy 2.0 (`Mapped` / `mapped_column` style) |
+| Database | PostgreSQL |
+| DB driver | psycopg (binary) |
+| Validation | Pydantic + pydantic-settings |
+| Configuration | Environment variables via `.env` |
+
+---
+
+## 3. Architecture
+
+The project follows a **layered architecture** with a single responsibility per class. The flow of a request is:
 
 ```
-Cliente HTTP
+HTTP Client
     │
     ▼
-Router          → define la ruta y el método HTTP (endpoint)
+Router          → defines the route and HTTP method (endpoint)
     │
     ▼
-Validator       → valida/serializa datos de entrada y salida (Pydantic)
+Validator       → validates/serializes input and output data (Pydantic)
     │
     ▼
-Controller      → orquesta la lógica de la operación
+Controller      → orchestrates the operation logic
     │
     ▼
-Model           → ejecuta la operación sobre la BD
+Model           → runs the operation against the DB
     │
     ▼
-Schema          → mapeo objeto-tabla (SQLAlchemy ORM)
+Schema          → object-table mapping (SQLAlchemy ORM)
     │
     ▼
 PostgreSQL
 ```
 
-### Significado de cada capa
+### What each layer does
 
-- **Router** (`app/routers/`): expone los endpoints HTTP y delega en el controller. No contiene lógica de negocio.
-- **Validator** (`app/schema_validator/`): modelos Pydantic que definen qué datos entran (`Create`) y qué datos salen (`Response`).
-- **Controller** (`app/controllers/`): coordina la operación; recibe los datos validados y llama al model.
-- **Model** (`app/models/`): contiene los métodos que hablan con la base de datos (`create`, etc.).
-- **Schema** (`app/schemas/`): clases SQLAlchemy que representan las tablas.
+- **Router** (`app/routers/`): exposes the HTTP endpoints and delegates to the controller. Contains no business logic.
+- **Validator** (`app/schema_validator/`): Pydantic models defining what data comes in (`Create`) and what data goes out (`Response`).
+- **Controller** (`app/controllers/`): coordinates the operation; receives the validated data and calls the model.
+- **Model** (`app/models/`): contains the methods that talk to the database (`create`, etc.).
+- **Schema** (`app/schemas/`): SQLAlchemy classes representing the tables.
 
 ---
 
-## 4. Estructura de carpetas
+## 4. Folder structure
 
 ```
 clinica_veterinaria/
 ├── app/
 │   ├── config/
-│   │   └── settings.py              # Configuración (lee .env)
-│   ├── controllers/                 # Lógica de cada entidad
+│   │   └── settings.py              # Configuration (reads .env)
+│   ├── controllers/                 # Logic for each entity
 │   ├── database/
-│   │   └── db_connection.py         # Engine, sesión y Base
-│   ├── models/                      # Operaciones contra la BD
-│   ├── routers/                     # Endpoints HTTP
-│   ├── schema_validator/            # Validadores Pydantic (entrada/salida)
-│   └── schemas/                     # Tablas SQLAlchemy (ORM)
-├── datos_clinica.xlsx               # Datos de ejemplo para poblar la BD
-├── Diagrama-veterinaria.drawio      # Diagrama entidad-relación
-├── main.py                          # Punto de entrada (crea la app y cablea routers)
+│   │   └── db_connection.py         # Engine, session and Base
+│   ├── models/                      # Database operations
+│   ├── routers/                     # HTTP endpoints
+│   ├── schema_validator/            # Pydantic validators (input/output)
+│   └── schemas/                     # SQLAlchemy tables (ORM)
+├── datos_clinica.xlsx               # Sample data to seed the DB
+├── Diagrama-veterinaria.drawio      # Entity-relationship diagram
+├── main.py                          # Entry point (creates the app and wires routers)
 ├── requirements.txt
-├── .env.example                     # Plantilla de variables de entorno
+├── .env.example                     # Environment variables template
 └── PLAN_DE_TRABAJO.md
 ```
 
 ---
 
-## 5. Modelo de datos
+## 5. Data model
 
-La API gestiona **7 entidades**.
+The API manages **7 entities**.
 
-### Propietario
-Dueño de una o varias mascotas.
+### Propietario (Owner)
+Owner of one or more pets.
 
-| Campo | Tipo | Restricciones |
-|-------|------|---------------|
+| Field | Type | Constraints |
+|-------|------|-------------|
 | id | int | PK |
-| nombre | str(100) | obligatorio |
-| correo | str(150) | obligatorio |
-| telefono | str(20) | obligatorio |
+| nombre | str(100) | required |
+| correo | str(150) | required |
+| telefono | str(20) | required |
 
-### Veterinario
-Profesional que atiende las citas.
+### Veterinario (Veterinarian)
+Professional who attends appointments.
 
-| Campo | Tipo | Restricciones |
-|-------|------|---------------|
+| Field | Type | Constraints |
+|-------|------|-------------|
 | id | int | PK |
-| nombre | str(100) | obligatorio |
-| especialidad | str(100) | obligatorio |
+| nombre | str(100) | required |
+| especialidad | str(100) | required |
 
-### Tratamiento
-Servicio o tratamiento que ofrece la clínica.
+### Tratamiento (Treatment)
+Service or treatment offered by the clinic.
 
-| Campo | Tipo | Restricciones |
-|-------|------|---------------|
+| Field | Type | Constraints |
+|-------|------|-------------|
 | id | int | PK |
-| nombre | str(100) | obligatorio |
-| tipo | str(100) | obligatorio |
-| costo | float | obligatorio |
+| nombre | str(100) | required |
+| tipo | str(100) | required |
+| costo | float | required |
 
-### Mascota
-Animal asociado a un propietario.
+### Mascota (Pet)
+Animal associated with an owner.
 
-| Campo | Tipo | Restricciones |
-|-------|------|---------------|
+| Field | Type | Constraints |
+|-------|------|-------------|
 | id | int | PK |
-| propietario_id | int | FK → propietarios.id, obligatorio |
-| nombre | str(100) | obligatorio |
-| especie | str(50) | obligatorio |
-| raza | str(50) | obligatorio |
-| fecha_nacimiento | date | obligatorio |
+| propietario_id | int | FK → propietarios.id, required |
+| nombre | str(100) | required |
+| especie | str(50) | required |
+| raza | str(50) | required |
+| fecha_nacimiento | date | required |
 
-### Historia Clínica
-Ficha clínica única de cada mascota (relación 1:1).
+### Historia Clínica (Clinical History)
+Unique clinical record for each pet (1:1 relationship).
 
-| Campo | Tipo | Restricciones |
-|-------|------|---------------|
+| Field | Type | Constraints |
+|-------|------|-------------|
 | id | int | PK |
-| mascota_id | int | FK → mascotas.id, **único**, obligatorio |
-| peso | float | obligatorio |
-| observaciones | str(250) | obligatorio |
+| mascota_id | int | FK → mascotas.id, **unique**, required |
+| peso | float | required |
+| observaciones | str(250) | required |
 
-### Cita
-Agenda de una visita de una mascota con un veterinario.
+### Cita (Appointment)
+Schedule of a pet's visit with a veterinarian.
 
-| Campo | Tipo | Restricciones |
-|-------|------|---------------|
+| Field | Type | Constraints |
+|-------|------|-------------|
 | id | int | PK |
-| mascota_id | int | FK → mascotas.id, obligatorio |
-| veterinario_id | int | FK → veterinarios.id, obligatorio |
-| fecha | datetime | obligatorio |
-| estado | str(50) | obligatorio |
+| mascota_id | int | FK → mascotas.id, required |
+| veterinario_id | int | FK → veterinarios.id, required |
+| fecha | datetime | required |
+| estado | str(50) | required |
 
-### Mascota–Tratamiento
-Tabla intermedia (N:M) que registra los tratamientos aplicados a una mascota.
+### Mascota–Tratamiento (Pet–Treatment)
+Junction table (N:M) recording the treatments applied to a pet.
 
-| Campo | Tipo | Restricciones |
-|-------|------|---------------|
+| Field | Type | Constraints |
+|-------|------|-------------|
 | id | int | PK |
-| mascota_id | int | FK → mascotas.id, obligatorio |
-| tratamiento_id | int | FK → tratamientos.id, obligatorio |
-| fecha_inicio | date | obligatorio |
-| fecha_fin | date | obligatorio |
-| dosis | str(100) | obligatorio |
+| mascota_id | int | FK → mascotas.id, required |
+| tratamiento_id | int | FK → tratamientos.id, required |
+| fecha_inicio | date | required |
+| fecha_fin | date | required |
+| dosis | str(100) | required |
 
-### Relaciones
+### Relationships
 
 ```
-Propietario  1 ───< N  Mascota
-Mascota      1 ───  1   Historia Clínica
-Mascota      1 ───< N  Cita  >─── 1  Veterinario
-Mascota      N >───< N  Tratamiento   (vía Mascota–Tratamiento)
+Owner        1 ───< N  Pet
+Pet          1 ───  1   Clinical History
+Pet          1 ───< N  Appointment  >─── 1  Veterinarian
+Pet          N >───< N  Treatment   (via Pet–Treatment)
 ```
 
-- Un **propietario** puede tener muchas **mascotas**.
-- Cada **mascota** tiene una única **historia clínica**.
-- Una **mascota** tiene muchas **citas**; cada cita la atiende un **veterinario**.
-- Una **mascota** puede recibir muchos **tratamientos** y un tratamiento se aplica a muchas mascotas (relación N:M resuelta con la tabla `mascota_tratamiento`).
+- An **owner** can have many **pets**.
+- Each **pet** has a single **clinical history**.
+- A **pet** has many **appointments**; each appointment is attended by a **veterinarian**.
+- A **pet** can receive many **treatments** and a treatment can be applied to many pets (N:M relationship resolved through the `mascota_tratamiento` table).
 
 ---
 
 ## 6. Endpoints
 
-Prefijo base por entidad y estado actual de implementación.
+Base prefix per entity and current implementation status.
 
-| Entidad | Prefijo | Endpoints implementados | Pendientes |
-|---------|---------|--------------------------|------------|
+| Entity | Prefix | Implemented endpoints | Pending |
+|--------|--------|------------------------|---------|
 | Home | `/` | `GET /` | — |
 | Health | `/health-db` | `GET /health-db` | — |
-| Propietarios | `/propietarios` | `POST /` | GET, GET/{id}, PUT, DELETE |
-| Veterinarios | `/veterinarios` | `POST /` | GET, GET/{id}, PUT, DELETE |
-| Tratamientos | `/tratamientos` | `POST /` | GET, GET/{id}, PUT, DELETE |
-| Mascotas | `/mascotas` | `POST /` | GET, GET/{id}, PUT, DELETE |
-| Historias clínicas | `/historias-clinicas` | `POST /` | GET, GET/{id}, PUT, DELETE |
-| Citas | `/citas` | `POST /` | GET, GET/{id}, PUT, DELETE |
-| Mascota–Tratamiento | `/mascotas-tratamientos` | `POST /` | GET, GET/{id}, PUT, DELETE |
+| Owners | `/propietarios` | `POST /` | GET, GET/{id}, PUT, DELETE |
+| Veterinarians | `/veterinarios` | `POST /` | GET, GET/{id}, PUT, DELETE |
+| Treatments | `/tratamientos` | `POST /` | GET, GET/{id}, PUT, DELETE |
+| Pets | `/mascotas` | `POST /` | GET, GET/{id}, PUT, DELETE |
+| Clinical histories | `/historias-clinicas` | `POST /` | GET, GET/{id}, PUT, DELETE |
+| Appointments | `/citas` | `POST /` | GET, GET/{id}, PUT, DELETE |
+| Pet–Treatment | `/mascotas-tratamientos` | `POST /` | GET, GET/{id}, PUT, DELETE |
 
-> ⚠️ Actualmente **solo está implementada la operación de crear (POST)** en cada entidad. El resto del CRUD está pendiente (ver `PLAN_DE_TRABAJO.md`).
+> ⚠️ Currently **only the create operation (POST)** is implemented for each entity. The rest of the CRUD is pending (see `PLAN_DE_TRABAJO.md`).
 
-### Documentación interactiva
-Con la app levantada:
+### Interactive documentation
+With the app running:
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
 ---
 
-## 7. Configuración (.env)
+## 7. Configuration (.env)
 
-La aplicación lee la configuración desde un archivo `.env` en la raíz. Variables necesarias:
+The application reads its configuration from a `.env` file in the root. Required variables:
 
 ```env
 APP_NAME=Clinica Veterinaria API
@@ -222,59 +222,59 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=clinica_veterinaria
 DB_USER=postgres
-DB_PASSWORD=tu_password
+DB_PASSWORD=your_password
 ```
 
-La URL de conexión se construye automáticamente en `settings.py`:
+The connection URL is built automatically in `settings.py`:
 ```
 postgresql+psycopg://<DB_USER>:<DB_PASSWORD>@<DB_HOST>:<DB_PORT>/<DB_NAME>
 ```
 
-> El archivo `.env` no se sube al repositorio (está en `.gitignore`). Usa `.env.example` como plantilla.
+> The `.env` file is not committed to the repository (it is in `.gitignore`). Use `.env.example` as a template.
 
 ---
 
-## 8. Puesta en marcha
+## 8. Getting started
 
 ```bash
-# 1. Crear y activar el entorno virtual
+# 1. Create and activate the virtual environment
 python -m venv .venv
 .venv\Scripts\activate          # Windows
 # source .venv/bin/activate     # macOS / Linux
 
-# 2. Instalar dependencias
+# 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Crear el archivo .env (copiar de .env.example y rellenar)
+# 3. Create the .env file (copy from .env.example and fill it in)
 
-# 4. Asegurarse de que PostgreSQL está corriendo y la BD existe
+# 4. Make sure PostgreSQL is running and the database exists
 
-# 5. Levantar el servidor
+# 5. Start the server
 uvicorn main:app --reload
 ```
 
-La app crea las tablas automáticamente al arrancar (`Base.metadata.create_all` en el `lifespan` de `main.py`).
+The app creates the tables automatically on startup (`Base.metadata.create_all` in the `lifespan` of `main.py`).
 
-Verificar conexión a BD: `GET http://localhost:8000/health-db`
-
----
-
-## 9. Convenciones del proyecto
-
-- **Idioma del código y la BD**: español (nombres de entidades, campos, tablas).
-- **Una clase por capa y entidad**: SRP (responsabilidad única).
-- **Sin lógica en `main.py`**: solo crea la app y cablea los routers.
-- **Git (Gitflow)**: `main` (estable) + `develop` (integración); ramas `feature/*`.
-- **Commits**: en inglés, modo imperativo (`add`, `fix`, `wire`...), concisos.
+Check the DB connection: `GET http://localhost:8000/health-db`
 
 ---
 
-## 10. Estado y próximos pasos
+## 9. Project conventions
 
-Trabajo pendiente detallado en **[`PLAN_DE_TRABAJO.md`](./PLAN_DE_TRABAJO.md)** y en el [tablero de GitHub Projects](https://github.com/users/DhanaCorredor/projects/7). Resumen:
+- **Code and DB language**: Spanish (entity, field and table names).
+- **One class per layer and entity**: SRP (single responsibility).
+- **No logic in `main.py`**: it only creates the app and wires the routers.
+- **Git (Gitflow)**: `main` (stable) + `develop` (integration); `feature/*` branches.
+- **Commits**: English, imperative mood (`add`, `fix`, `wire`...), concise.
 
-1. **CRUD completo** (GET, GET/{id}, PUT, DELETE) en las 7 entidades.
-2. **Manejo de errores** (404 / validación de claves foráneas).
-3. **Carga de datos** desde `datos_clinica.xlsx`.
-4. **Tests** con pytest + TestClient.
-5. **README** de instalación y uso.
+---
+
+## 10. Status and next steps
+
+Pending work is detailed in **[`PLAN_DE_TRABAJO.md`](./PLAN_DE_TRABAJO.md)** and on the [GitHub Projects board](https://github.com/users/DhanaCorredor/projects/7). Summary:
+
+1. **Complete CRUD** (GET, GET/{id}, PUT, DELETE) for the 7 entities.
+2. **Error handling** (404 / foreign key validation).
+3. **Data seeding** from `datos_clinica.xlsx`.
+4. **Tests** with pytest + TestClient.
+5. **README** for installation and usage.
