@@ -11,6 +11,10 @@ class TratamientoCreateValidator(TratamientoBaseValidator):
     pass
 
 
+class TratamientoUpdateValidator(TratamientoBaseValidator):
+    pass
+
+
 class TratamientoResponseValidator(TratamientoBaseValidator):
     id: int
 

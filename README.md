@@ -38,13 +38,10 @@ The project follows a **layered architecture** with a single responsibility per 
 HTTP Client
     │
     ▼
-Router          → defines the route and HTTP method (endpoint)
-    │
+Router          → defines the route + HTTP method (endpoint), orchestrates
+    │              the operation and handles errors (404)
     ▼
 Validator       → validates/serializes input and output data (Pydantic)
-    │
-    ▼
-Controller      → orchestrates the operation logic
     │
     ▼
 Model           → runs the operation against the DB
@@ -58,10 +55,9 @@ PostgreSQL
 
 ### What each layer does
 
-- **Router** (`app/routers/`): exposes the HTTP endpoints and delegates to the controller. Contains no business logic.
-- **Validator** (`app/schema_validator/`): Pydantic models defining what data comes in (`Create`) and what data goes out (`Response`).
-- **Controller** (`app/controllers/`): coordinates the operation; receives the validated data and calls the model.
-- **Model** (`app/models/`): contains the methods that talk to the database (`create`, etc.).
+- **Router** (`app/routers/`): exposes the HTTP endpoints, validates with Pydantic, calls the model and raises `HTTPException` (404) when needed. In FastAPI the route handler already plays the controller role, so there is no separate controller layer.
+- **Validator** (`app/schema_validator/`): Pydantic models defining what data comes in (`Create` / `Update`) and what data goes out (`Response`).
+- **Model** (`app/models/`): contains the methods that talk to the database (`create`, `get_all`, `get_by_id`, `update`, `delete`).
 - **Schema** (`app/schemas/`): SQLAlchemy classes representing the tables.
 
 ---
@@ -73,11 +69,10 @@ clinica_veterinaria/
 ├── app/
 │   ├── config/
 │   │   └── settings.py              # Configuration (reads .env)
-│   ├── controllers/                 # Logic for each entity
 │   ├── database/
 │   │   └── db_connection.py         # Engine, session and Base
 │   ├── models/                      # Database operations
-│   ├── routers/                     # HTTP endpoints
+│   ├── routers/                     # HTTP endpoints + orchestration
 │   ├── schema_validator/            # Pydantic validators (input/output)
 │   └── schemas/                     # SQLAlchemy tables (ORM)
 ├── datos_clinica.xlsx               # Sample data to seed the DB
@@ -192,15 +187,15 @@ Base prefix per entity and current implementation status.
 |--------|--------|------------------------|---------|
 | Home | `/` | `GET /` | — |
 | Health | `/health-db` | `GET /health-db` | — |
-| Owners | `/propietarios` | `POST /` | GET, GET/{id}, PUT, DELETE |
-| Veterinarians | `/veterinarios` | `POST /` | GET, GET/{id}, PUT, DELETE |
-| Treatments | `/tratamientos` | `POST /` | GET, GET/{id}, PUT, DELETE |
-| Pets | `/mascotas` | `POST /` | GET, GET/{id}, PUT, DELETE |
-| Clinical histories | `/historias_clinicas` | `POST /` | GET, GET/{id}, PUT, DELETE |
-| Appointments | `/citas` | `POST /` | GET, GET/{id}, PUT, DELETE |
-| Pet–Treatment | `/mascota_tratamiento` | `POST /` | GET, GET/{id}, PUT, DELETE |
+| Owners | `/propietarios` | full CRUD | — |
+| Veterinarians | `/veterinarios` | full CRUD | — |
+| Treatments | `/tratamientos` | full CRUD | — |
+| Pets | `/mascotas` | full CRUD | — |
+| Clinical histories | `/historias_clinicas` | full CRUD | — |
+| Appointments | `/citas` | full CRUD | — |
+| Pet–Treatment | `/mascota_tratamiento` | full CRUD | — |
 
-> ⚠️ Currently **only the create operation (POST)** is implemented for each entity. The rest of the CRUD is pending (see `PLAN_DE_TRABAJO.md`).
+> **full CRUD** = `POST /`, `GET /`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}`. `GET /{id}`, `PUT` and `DELETE` return `404` when the id does not exist.
 
 ### Interactive documentation
 With the app running:
@@ -273,8 +268,8 @@ Check the DB connection: `GET http://localhost:8000/health-db`
 
 Pending work is detailed in **[`PLAN_DE_TRABAJO.md`](./PLAN_DE_TRABAJO.md)** and on the [GitHub Projects board](https://github.com/users/DhanaCorredor/projects/7). Summary:
 
-1. **Complete CRUD** (GET, GET/{id}, PUT, DELETE) for the 7 entities.
-2. **Error handling** (404 / foreign key validation).
+1. ~~**Complete CRUD** (GET, GET/{id}, PUT, DELETE) for the 7 entities.~~ ✅ Done.
+2. **Error handling**: 404 is done across all entities; foreign-key validation (e.g. creating a pet with a non-existent `propietario_id`) is still pending.
 3. **Data seeding** from `datos_clinica.xlsx`.
 4. **Tests** with pytest + TestClient.
-5. **README** for installation and usage.
+5. ~~**README** for installation and usage.~~ ✅ Done (this file).

@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.controllers.mascota_controller import MascotaController
 from app.database.db_connection import get_db
+from app.models.mascota_model import MascotaModel
 from app.schema_validator.mascota_validator import (
     MascotaCreateValidator,
     MascotaUpdateValidator,
@@ -15,6 +15,16 @@ router = APIRouter(
 )
 
 
+def get_mascota_or_404(db: Session, mascota_id: int):
+    mascota = MascotaModel.get_by_id(db=db, mascota_id=mascota_id)
+    if mascota is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Mascota con id {mascota_id} no encontrada"
+        )
+    return mascota
+
+
 @router.post(
     "/",
     response_model=MascotaResponseValidator,
@@ -23,9 +33,14 @@ router = APIRouter(
 def create_mascota(
         mascota_data: MascotaCreateValidator,
         db: Session = Depends(get_db)):
-    return MascotaController.create_mascota(
+    return MascotaModel.create(
         db=db,
-        mascota_data=mascota_data)
+        propietario_id=mascota_data.propietario_id,
+        nombre=mascota_data.nombre,
+        especie=mascota_data.especie,
+        raza=mascota_data.raza,
+        fecha_nacimiento=mascota_data.fecha_nacimiento
+    )
 
 
 @router.get(
@@ -33,7 +48,7 @@ def create_mascota(
     response_model=list[MascotaResponseValidator],
 )
 def get_mascotas(db: Session = Depends(get_db)):
-    return MascotaController.get_mascotas(db=db)
+    return MascotaModel.get_all(db=db)
 
 
 @router.get(
@@ -43,7 +58,7 @@ def get_mascotas(db: Session = Depends(get_db)):
 def get_mascota(
         mascota_id: int,
         db: Session = Depends(get_db)):
-    return MascotaController.get_mascota(db=db, mascota_id=mascota_id)
+    return get_mascota_or_404(db=db, mascota_id=mascota_id)
 
 
 @router.put(
@@ -54,10 +69,16 @@ def update_mascota(
         mascota_id: int,
         mascota_data: MascotaUpdateValidator,
         db: Session = Depends(get_db)):
-    return MascotaController.update_mascota(
+    mascota = get_mascota_or_404(db=db, mascota_id=mascota_id)
+    return MascotaModel.update(
         db=db,
-        mascota_id=mascota_id,
-        mascota_data=mascota_data)
+        mascota=mascota,
+        propietario_id=mascota_data.propietario_id,
+        nombre=mascota_data.nombre,
+        especie=mascota_data.especie,
+        raza=mascota_data.raza,
+        fecha_nacimiento=mascota_data.fecha_nacimiento
+    )
 
 
 @router.delete(
@@ -67,4 +88,5 @@ def update_mascota(
 def delete_mascota(
         mascota_id: int,
         db: Session = Depends(get_db)):
-    MascotaController.delete_mascota(db=db, mascota_id=mascota_id)
+    mascota = get_mascota_or_404(db=db, mascota_id=mascota_id)
+    MascotaModel.delete(db=db, mascota=mascota)

@@ -1,52 +1,51 @@
 # Plan de trabajo — API Clínica Veterinaria
 
 API REST con **FastAPI + SQLAlchemy + PostgreSQL**. Arquitectura por capas:
-`router → controller → model → schema (SQLAlchemy)` + validadores Pydantic.
+`router → model → schema (SQLAlchemy)` + validadores Pydantic. En FastAPI el router ya cumple el rol de controller, así que no hay capa controller separada.
 
 ## Estado actual
 
 - ✅ Estructura del proyecto y arquitectura por capas montada.
 - ✅ 7 entidades modeladas: propietario, veterinario, tratamiento, mascota, historia_clinica, cita, mascota_tratamiento.
 - ✅ Conexión a BD, settings con `.env`, routers cableados en `main.py`, endpoint `/health-db`.
-- ✅ Operación **CREATE (POST)** implementada en las 7 entidades.
-- ⚠️ Solo existe el POST: falta el resto del CRUD.
+- ✅ **CRUD completo (POST, GET, GET/{id}, PUT, DELETE) en las 7 entidades**, con manejo de 404.
 
 ## Qué falta (resumen)
 
 | Área | Estado |
 |------|--------|
-| Crear (POST) | ✅ Hecho |
-| Listar / Obtener / Actualizar / Eliminar | ❌ Falta |
-| Manejo de errores (404 / 400) | ❌ Falta |
+| CRUD completo (7 entidades) | ✅ Hecho |
+| Manejo de 404 | ✅ Hecho |
+| Validación de claves foráneas (400) | ❌ Falta |
 | Carga de datos desde `datos_clinica.xlsx` | ❌ Falta |
 | Tests (pytest) | ❌ Falta |
-| README / documentación | ❌ Falta |
+| README / documentación | ✅ Hecho (revisar al cierre) |
 
 ---
 
 ## Fase 1 — Completar el CRUD (núcleo del proyecto)
 
-Por cada una de las 7 entidades, añadir en las 3 capas (model → controller → router):
+Por cada una de las 7 entidades, añadir en las 2 capas (model → router):
 
-- [ ] `GET /` — listar todos
-- [ ] `GET /{id}` — obtener por id (404 si no existe)
-- [ ] `PUT /{id}` — actualizar (404 si no existe)
-- [ ] `DELETE /{id}` — eliminar (404 si no existe)
+- [x] `GET /` — listar todos
+- [x] `GET /{id}` — obtener por id (404 si no existe)
+- [x] `PUT /{id}` — actualizar (404 si no existe)
+- [x] `DELETE /{id}` — eliminar (404 si no existe)
 
 **Subtareas por entidad:**
-- [ ] propietario
-- [ ] veterinario
-- [ ] tratamiento
-- [ ] mascota
-- [ ] historia_clinica
-- [ ] cita
-- [ ] mascota_tratamiento
+- [x] propietario
+- [x] veterinario
+- [x] tratamiento
+- [x] mascota
+- [x] historia_clinica
+- [x] cita
+- [x] mascota_tratamiento
 
-> Recomendación: hacer **mascota** completo primero como plantilla y replicar el patrón en el resto.
+> ✅ Fase 1 completada: las 7 entidades tienen el CRUD completo con manejo de 404.
 
 ## Fase 2 — Manejo de errores
 
-- [ ] Devolver `404 Not Found` (con `HTTPException`) cuando un id no existe.
+- [x] Devolver `404 Not Found` (con `HTTPException`) cuando un id no existe — hecho en las 7 entidades (helper `get_X_or_404`).
 - [ ] Validar claves foráneas (ej. crear mascota con `propietario_id` inexistente → `400/404`).
 - [ ] Respuestas de error consistentes en toda la API.
 
@@ -64,8 +63,8 @@ Por cada una de las 7 entidades, añadir en las 3 capas (model → controller �
 
 ## Fase 5 — Documentación y cierre
 
-- [ ] `README.md`: descripción, requisitos, instalación, configuración del `.env`, cómo arrancar (`uvicorn main:app --reload`), enlace a `/docs`.
-- [ ] Revisar que `/docs` (Swagger) muestre todos los endpoints correctamente.
+- [x] `README.md`: descripción, requisitos, instalación, configuración del `.env`, cómo arrancar (`uvicorn main:app --reload`), enlace a `/docs`.
+- [x] Revisar que `/docs` (Swagger) muestre todos los endpoints correctamente — verificado vía esquema OpenAPI (37 endpoints).
 - [ ] Limpieza final y commit.
 
 ---
