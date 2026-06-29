@@ -16,7 +16,7 @@ router = APIRouter(
 
 
 def get_veterinario_or_404(db: Session, veterinario_id: int):
-    veterinario = VeterinarioModel.get_by_id(db=db, veterinario_id=veterinario_id)
+    veterinario = VeterinarioModel.get_by_id(db=db, id_=veterinario_id)
     if veterinario is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -33,11 +33,7 @@ def get_veterinario_or_404(db: Session, veterinario_id: int):
 def create_veterinario(
         veterinario_data: VeterinarioCreateValidator,
         db: Session = Depends(get_db)):
-    return VeterinarioModel.create(
-        db=db,
-        nombre=veterinario_data.nombre,
-        especialidad=veterinario_data.especialidad
-    )
+    return VeterinarioModel.create(db=db, data=veterinario_data.model_dump())
 
 
 @router.get(
@@ -67,12 +63,7 @@ def update_veterinario(
         veterinario_data: VeterinarioUpdateValidator,
         db: Session = Depends(get_db)):
     veterinario = get_veterinario_or_404(db=db, veterinario_id=veterinario_id)
-    return VeterinarioModel.update(
-        db=db,
-        veterinario=veterinario,
-        nombre=veterinario_data.nombre,
-        especialidad=veterinario_data.especialidad
-    )
+    return VeterinarioModel.update(db=db, obj=veterinario, data=veterinario_data.model_dump())
 
 
 @router.delete(
@@ -83,4 +74,4 @@ def delete_veterinario(
         veterinario_id: int,
         db: Session = Depends(get_db)):
     veterinario = get_veterinario_or_404(db=db, veterinario_id=veterinario_id)
-    VeterinarioModel.delete(db=db, veterinario=veterinario)
+    VeterinarioModel.delete(db=db, obj=veterinario)

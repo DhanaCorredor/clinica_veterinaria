@@ -16,7 +16,7 @@ router = APIRouter(
 
 
 def get_propietario_or_404(db: Session, propietario_id: int):
-    propietario = PropietarioModel.get_by_id(db=db, propietario_id=propietario_id)
+    propietario = PropietarioModel.get_by_id(db=db, id_=propietario_id)
     if propietario is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -33,12 +33,7 @@ def get_propietario_or_404(db: Session, propietario_id: int):
 def create_propietario(
         propietario_data: PropietarioCreateValidator,
         db: Session = Depends(get_db)):
-    return PropietarioModel.create(
-        db=db,
-        nombre=propietario_data.nombre,
-        correo=propietario_data.correo,
-        telefono=propietario_data.telefono
-    )
+    return PropietarioModel.create(db=db, data=propietario_data.model_dump())
 
 
 @router.get(
@@ -68,13 +63,7 @@ def update_propietario(
         propietario_data: PropietarioUpdateValidator,
         db: Session = Depends(get_db)):
     propietario = get_propietario_or_404(db=db, propietario_id=propietario_id)
-    return PropietarioModel.update(
-        db=db,
-        propietario=propietario,
-        nombre=propietario_data.nombre,
-        correo=propietario_data.correo,
-        telefono=propietario_data.telefono
-    )
+    return PropietarioModel.update(db=db, obj=propietario, data=propietario_data.model_dump())
 
 
 @router.delete(
@@ -85,4 +74,4 @@ def delete_propietario(
         propietario_id: int,
         db: Session = Depends(get_db)):
     propietario = get_propietario_or_404(db=db, propietario_id=propietario_id)
-    PropietarioModel.delete(db=db, propietario=propietario)
+    PropietarioModel.delete(db=db, obj=propietario)

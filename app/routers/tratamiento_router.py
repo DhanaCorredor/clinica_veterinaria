@@ -16,7 +16,7 @@ router = APIRouter(
 
 
 def get_tratamiento_or_404(db: Session, tratamiento_id: int):
-    tratamiento = TratamientoModel.get_by_id(db=db, tratamiento_id=tratamiento_id)
+    tratamiento = TratamientoModel.get_by_id(db=db, id_=tratamiento_id)
     if tratamiento is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -33,12 +33,7 @@ def get_tratamiento_or_404(db: Session, tratamiento_id: int):
 def create_tratamiento(
         tratamiento_data: TratamientoCreateValidator,
         db: Session = Depends(get_db)):
-    return TratamientoModel.create(
-        db=db,
-        nombre=tratamiento_data.nombre,
-        tipo=tratamiento_data.tipo,
-        costo=tratamiento_data.costo
-    )
+    return TratamientoModel.create(db=db, data=tratamiento_data.model_dump())
 
 
 @router.get(
@@ -68,13 +63,7 @@ def update_tratamiento(
         tratamiento_data: TratamientoUpdateValidator,
         db: Session = Depends(get_db)):
     tratamiento = get_tratamiento_or_404(db=db, tratamiento_id=tratamiento_id)
-    return TratamientoModel.update(
-        db=db,
-        tratamiento=tratamiento,
-        nombre=tratamiento_data.nombre,
-        tipo=tratamiento_data.tipo,
-        costo=tratamiento_data.costo
-    )
+    return TratamientoModel.update(db=db, obj=tratamiento, data=tratamiento_data.model_dump())
 
 
 @router.delete(
@@ -85,4 +74,4 @@ def delete_tratamiento(
         tratamiento_id: int,
         db: Session = Depends(get_db)):
     tratamiento = get_tratamiento_or_404(db=db, tratamiento_id=tratamiento_id)
-    TratamientoModel.delete(db=db, tratamiento=tratamiento)
+    TratamientoModel.delete(db=db, obj=tratamiento)

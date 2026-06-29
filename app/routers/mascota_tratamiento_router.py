@@ -16,7 +16,7 @@ router = APIRouter(
 
 
 def get_registro_or_404(db: Session, registro_id: int):
-    registro = MascotaTratamientoModel.get_by_id(db=db, registro_id=registro_id)
+    registro = MascotaTratamientoModel.get_by_id(db=db, id_=registro_id)
     if registro is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -33,14 +33,7 @@ def get_registro_or_404(db: Session, registro_id: int):
 def create_mascota_tratamiento(
         registro_data: MascotaTratamientoCreateValidator,
         db: Session = Depends(get_db)):
-    return MascotaTratamientoModel.create(
-        db=db,
-        mascota_id=registro_data.mascota_id,
-        tratamiento_id=registro_data.tratamiento_id,
-        fecha_inicio=registro_data.fecha_inicio,
-        fecha_fin=registro_data.fecha_fin,
-        dosis=registro_data.dosis
-    )
+    return MascotaTratamientoModel.create(db=db, data=registro_data.model_dump())
 
 
 @router.get(
@@ -70,15 +63,7 @@ def update_registro(
         registro_data: MascotaTratamientoUpdateValidator,
         db: Session = Depends(get_db)):
     registro = get_registro_or_404(db=db, registro_id=registro_id)
-    return MascotaTratamientoModel.update(
-        db=db,
-        registro=registro,
-        mascota_id=registro_data.mascota_id,
-        tratamiento_id=registro_data.tratamiento_id,
-        fecha_inicio=registro_data.fecha_inicio,
-        fecha_fin=registro_data.fecha_fin,
-        dosis=registro_data.dosis
-    )
+    return MascotaTratamientoModel.update(db=db, obj=registro, data=registro_data.model_dump())
 
 
 @router.delete(
@@ -89,4 +74,4 @@ def delete_registro(
         registro_id: int,
         db: Session = Depends(get_db)):
     registro = get_registro_or_404(db=db, registro_id=registro_id)
-    MascotaTratamientoModel.delete(db=db, registro=registro)
+    MascotaTratamientoModel.delete(db=db, obj=registro)
