@@ -11,6 +11,10 @@ class HistoriaClinicaCreateValidator(HistoriaClinicaBaseValidator):
     pass
 
 
+class HistoriaClinicaUpdateValidator(HistoriaClinicaBaseValidator):
+    pass
+
+
 class HistoriaClinicaResponseValidator(HistoriaClinicaBaseValidator):
     id: int
 

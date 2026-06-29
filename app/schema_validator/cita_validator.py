@@ -13,6 +13,10 @@ class CitaCreateValidator(CitaBaseValidator):
     pass
 
 
+class CitaUpdateValidator(CitaBaseValidator):
+    pass
+
+
 class CitaResponseValidator(CitaBaseValidator):
     id: int
 

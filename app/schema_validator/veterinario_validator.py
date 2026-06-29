@@ -10,6 +10,10 @@ class VeterinarioCreateValidator(VeterinarioBaseValidator):
     pass
 
 
+class VeterinarioUpdateValidator(VeterinarioBaseValidator):
+    pass
+
+
 class VeterinarioResponseValidator(VeterinarioBaseValidator):
     id: int
 

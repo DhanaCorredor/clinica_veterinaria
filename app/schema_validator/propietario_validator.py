@@ -11,6 +11,10 @@ class PropietarioCreateValidator(PropietarioBaseValidator):
     pass
 
 
+class PropietarioUpdateValidator(PropietarioBaseValidator):
+    pass
+
+
 class PropietarioResponseValidator(PropietarioBaseValidator):
     id: int
 
