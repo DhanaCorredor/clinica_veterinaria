@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     app_name: str
     app_version: str
     app_description: str
+    debug: bool = False  # activa el echo de SQL del engine
 
     # Base de datos
     db_host: str

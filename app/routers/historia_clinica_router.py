@@ -16,7 +16,7 @@ router = APIRouter(
 
 
 def get_historia_or_404(db: Session, historia_id: int):
-    historia = HistoriaClinicaModel.get_by_id(db=db, historia_id=historia_id)
+    historia = HistoriaClinicaModel.get_by_id(db=db, id_=historia_id)
     if historia is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -33,12 +33,7 @@ def get_historia_or_404(db: Session, historia_id: int):
 def create_historia_clinica(
         historia_data: HistoriaClinicaCreateValidator,
         db: Session = Depends(get_db)):
-    return HistoriaClinicaModel.create(
-        db=db,
-        mascota_id=historia_data.mascota_id,
-        peso=historia_data.peso,
-        observaciones=historia_data.observaciones
-    )
+    return HistoriaClinicaModel.create(db=db, data=historia_data.model_dump())
 
 
 @router.get(
@@ -68,13 +63,7 @@ def update_historia_clinica(
         historia_data: HistoriaClinicaUpdateValidator,
         db: Session = Depends(get_db)):
     historia = get_historia_or_404(db=db, historia_id=historia_id)
-    return HistoriaClinicaModel.update(
-        db=db,
-        historia=historia,
-        mascota_id=historia_data.mascota_id,
-        peso=historia_data.peso,
-        observaciones=historia_data.observaciones
-    )
+    return HistoriaClinicaModel.update(db=db, obj=historia, data=historia_data.model_dump())
 
 
 @router.delete(
@@ -85,4 +74,4 @@ def delete_historia_clinica(
         historia_id: int,
         db: Session = Depends(get_db)):
     historia = get_historia_or_404(db=db, historia_id=historia_id)
-    HistoriaClinicaModel.delete(db=db, historia=historia)
+    HistoriaClinicaModel.delete(db=db, obj=historia)

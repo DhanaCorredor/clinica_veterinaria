@@ -57,7 +57,7 @@ PostgreSQL
 
 - **Router** (`app/routers/`): exposes the HTTP endpoints, validates with Pydantic, calls the model and raises `HTTPException` (404) when needed. In FastAPI the route handler already plays the controller role, so there is no separate controller layer.
 - **Validator** (`app/schema_validator/`): Pydantic models defining what data comes in (`Create` / `Update`) and what data goes out (`Response`).
-- **Model** (`app/models/`): contains the methods that talk to the database (`create`, `get_all`, `get_by_id`, `update`, `delete`).
+- **Model** (`app/models/`): talks to the database. The generic CRUD (`create`, `get_all`, `get_by_id`, `update`, `delete`) lives in `BaseModel` (`base_model.py`); each entity model just inherits from it and declares its `schema`.
 - **Schema** (`app/schemas/`): SQLAlchemy classes representing the tables.
 
 ---
@@ -71,7 +71,7 @@ clinica_veterinaria/
 │   │   └── settings.py              # Configuration (reads .env)
 │   ├── database/
 │   │   └── db_connection.py         # Engine, session and Base
-│   ├── models/                      # Database operations
+│   ├── models/                      # Database operations (base_model.py = generic CRUD)
 │   ├── routers/                     # HTTP endpoints + orchestration
 │   ├── schema_validator/            # Pydantic validators (input/output)
 │   └── schemas/                     # SQLAlchemy tables (ORM)
@@ -212,6 +212,7 @@ The application reads its configuration from a `.env` file in the root. Required
 APP_NAME=Clinica Veterinaria API
 APP_VERSION=1.0.0
 APP_DESCRIPTION=API para la gestion de una clinica veterinaria
+DEBUG=false                         # true → logs every SQL statement (echo)
 
 DB_HOST=localhost
 DB_PORT=5432
