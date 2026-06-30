@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from app.controllers.historia_clinica_controller import HistoriaClinicaController
 from app.database.db_connection import get_db
-from app.models.historia_clinica_model import HistoriaClinicaModel
 from app.schema_validator.historia_clinica_validator import (
     HistoriaClinicaCreateValidator,
     HistoriaClinicaUpdateValidator,
@@ -15,16 +15,6 @@ router = APIRouter(
 )
 
 
-def get_historia_or_404(db: Session, historia_id: int):
-    historia = HistoriaClinicaModel.get_by_id(db=db, id_=historia_id)
-    if historia is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Historia clinica con id {historia_id} no encontrada"
-        )
-    return historia
-
-
 @router.post(
     "/",
     response_model=HistoriaClinicaResponseValidator,
@@ -33,7 +23,7 @@ def get_historia_or_404(db: Session, historia_id: int):
 def create_historia_clinica(
         historia_data: HistoriaClinicaCreateValidator,
         db: Session = Depends(get_db)):
-    return HistoriaClinicaModel.create(db=db, data=historia_data.model_dump())
+    return HistoriaClinicaController.create(db=db, data=historia_data)
 
 
 @router.get(
@@ -41,7 +31,7 @@ def create_historia_clinica(
     response_model=list[HistoriaClinicaResponseValidator],
 )
 def get_historias_clinicas(db: Session = Depends(get_db)):
-    return HistoriaClinicaModel.get_all(db=db)
+    return HistoriaClinicaController.get_all(db=db)
 
 
 @router.get(
@@ -51,7 +41,7 @@ def get_historias_clinicas(db: Session = Depends(get_db)):
 def get_historia_clinica(
         historia_id: int,
         db: Session = Depends(get_db)):
-    return get_historia_or_404(db=db, historia_id=historia_id)
+    return HistoriaClinicaController.get_by_id(db=db, historia_id=historia_id)
 
 
 @router.put(
@@ -62,8 +52,7 @@ def update_historia_clinica(
         historia_id: int,
         historia_data: HistoriaClinicaUpdateValidator,
         db: Session = Depends(get_db)):
-    historia = get_historia_or_404(db=db, historia_id=historia_id)
-    return HistoriaClinicaModel.update(db=db, obj=historia, data=historia_data.model_dump())
+    return HistoriaClinicaController.update(db=db, historia_id=historia_id, data=historia_data)
 
 
 @router.delete(
@@ -73,5 +62,4 @@ def update_historia_clinica(
 def delete_historia_clinica(
         historia_id: int,
         db: Session = Depends(get_db)):
-    historia = get_historia_or_404(db=db, historia_id=historia_id)
-    HistoriaClinicaModel.delete(db=db, obj=historia)
+    HistoriaClinicaController.delete(db=db, historia_id=historia_id)

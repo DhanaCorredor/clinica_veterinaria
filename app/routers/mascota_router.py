@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from app.controllers.mascota_controller import MascotaController
 from app.database.db_connection import get_db
-from app.models.mascota_model import MascotaModel
 from app.schema_validator.mascota_validator import (
     MascotaCreateValidator,
     MascotaUpdateValidator,
@@ -15,16 +15,6 @@ router = APIRouter(
 )
 
 
-def get_mascota_or_404(db: Session, mascota_id: int):
-    mascota = MascotaModel.get_by_id(db=db, id_=mascota_id)
-    if mascota is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Mascota con id {mascota_id} no encontrada"
-        )
-    return mascota
-
-
 @router.post(
     "/",
     response_model=MascotaResponseValidator,
@@ -33,7 +23,7 @@ def get_mascota_or_404(db: Session, mascota_id: int):
 def create_mascota(
         mascota_data: MascotaCreateValidator,
         db: Session = Depends(get_db)):
-    return MascotaModel.create(db=db, data=mascota_data.model_dump())
+    return MascotaController.create(db=db, data=mascota_data)
 
 
 @router.get(
@@ -41,7 +31,7 @@ def create_mascota(
     response_model=list[MascotaResponseValidator],
 )
 def get_mascotas(db: Session = Depends(get_db)):
-    return MascotaModel.get_all(db=db)
+    return MascotaController.get_all(db=db)
 
 
 @router.get(
@@ -51,7 +41,7 @@ def get_mascotas(db: Session = Depends(get_db)):
 def get_mascota(
         mascota_id: int,
         db: Session = Depends(get_db)):
-    return get_mascota_or_404(db=db, mascota_id=mascota_id)
+    return MascotaController.get_by_id(db=db, mascota_id=mascota_id)
 
 
 @router.put(
@@ -62,8 +52,7 @@ def update_mascota(
         mascota_id: int,
         mascota_data: MascotaUpdateValidator,
         db: Session = Depends(get_db)):
-    mascota = get_mascota_or_404(db=db, mascota_id=mascota_id)
-    return MascotaModel.update(db=db, obj=mascota, data=mascota_data.model_dump())
+    return MascotaController.update(db=db, mascota_id=mascota_id, data=mascota_data)
 
 
 @router.delete(
@@ -73,5 +62,4 @@ def update_mascota(
 def delete_mascota(
         mascota_id: int,
         db: Session = Depends(get_db)):
-    mascota = get_mascota_or_404(db=db, mascota_id=mascota_id)
-    MascotaModel.delete(db=db, obj=mascota)
+    MascotaController.delete(db=db, mascota_id=mascota_id)

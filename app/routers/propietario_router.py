@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from app.controllers.propietario_controller import PropietarioController
 from app.database.db_connection import get_db
-from app.models.propietario_model import PropietarioModel
 from app.schema_validator.propietario_validator import (
     PropietarioCreateValidator,
     PropietarioUpdateValidator,
@@ -15,16 +15,6 @@ router = APIRouter(
 )
 
 
-def get_propietario_or_404(db: Session, propietario_id: int):
-    propietario = PropietarioModel.get_by_id(db=db, id_=propietario_id)
-    if propietario is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Propietario con id {propietario_id} no encontrado"
-        )
-    return propietario
-
-
 @router.post(
     "/",
     response_model=PropietarioResponseValidator,
@@ -33,7 +23,7 @@ def get_propietario_or_404(db: Session, propietario_id: int):
 def create_propietario(
         propietario_data: PropietarioCreateValidator,
         db: Session = Depends(get_db)):
-    return PropietarioModel.create(db=db, data=propietario_data.model_dump())
+    return PropietarioController.create(db=db, data=propietario_data)
 
 
 @router.get(
@@ -41,7 +31,7 @@ def create_propietario(
     response_model=list[PropietarioResponseValidator],
 )
 def get_propietarios(db: Session = Depends(get_db)):
-    return PropietarioModel.get_all(db=db)
+    return PropietarioController.get_all(db=db)
 
 
 @router.get(
@@ -51,7 +41,7 @@ def get_propietarios(db: Session = Depends(get_db)):
 def get_propietario(
         propietario_id: int,
         db: Session = Depends(get_db)):
-    return get_propietario_or_404(db=db, propietario_id=propietario_id)
+    return PropietarioController.get_by_id(db=db, propietario_id=propietario_id)
 
 
 @router.put(
@@ -62,8 +52,7 @@ def update_propietario(
         propietario_id: int,
         propietario_data: PropietarioUpdateValidator,
         db: Session = Depends(get_db)):
-    propietario = get_propietario_or_404(db=db, propietario_id=propietario_id)
-    return PropietarioModel.update(db=db, obj=propietario, data=propietario_data.model_dump())
+    return PropietarioController.update(db=db, propietario_id=propietario_id, data=propietario_data)
 
 
 @router.delete(
@@ -73,5 +62,4 @@ def update_propietario(
 def delete_propietario(
         propietario_id: int,
         db: Session = Depends(get_db)):
-    propietario = get_propietario_or_404(db=db, propietario_id=propietario_id)
-    PropietarioModel.delete(db=db, obj=propietario)
+    PropietarioController.delete(db=db, propietario_id=propietario_id)

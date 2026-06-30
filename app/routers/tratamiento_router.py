@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from app.controllers.tratamiento_controller import TratamientoController
 from app.database.db_connection import get_db
-from app.models.tratamiento_model import TratamientoModel
 from app.schema_validator.tratamiento_validator import (
     TratamientoCreateValidator,
     TratamientoUpdateValidator,
@@ -15,16 +15,6 @@ router = APIRouter(
 )
 
 
-def get_tratamiento_or_404(db: Session, tratamiento_id: int):
-    tratamiento = TratamientoModel.get_by_id(db=db, id_=tratamiento_id)
-    if tratamiento is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Tratamiento con id {tratamiento_id} no encontrado"
-        )
-    return tratamiento
-
-
 @router.post(
     "/",
     response_model=TratamientoResponseValidator,
@@ -33,7 +23,7 @@ def get_tratamiento_or_404(db: Session, tratamiento_id: int):
 def create_tratamiento(
         tratamiento_data: TratamientoCreateValidator,
         db: Session = Depends(get_db)):
-    return TratamientoModel.create(db=db, data=tratamiento_data.model_dump())
+    return TratamientoController.create(db=db, data=tratamiento_data)
 
 
 @router.get(
@@ -41,7 +31,7 @@ def create_tratamiento(
     response_model=list[TratamientoResponseValidator],
 )
 def get_tratamientos(db: Session = Depends(get_db)):
-    return TratamientoModel.get_all(db=db)
+    return TratamientoController.get_all(db=db)
 
 
 @router.get(
@@ -51,7 +41,7 @@ def get_tratamientos(db: Session = Depends(get_db)):
 def get_tratamiento(
         tratamiento_id: int,
         db: Session = Depends(get_db)):
-    return get_tratamiento_or_404(db=db, tratamiento_id=tratamiento_id)
+    return TratamientoController.get_by_id(db=db, tratamiento_id=tratamiento_id)
 
 
 @router.put(
@@ -62,8 +52,7 @@ def update_tratamiento(
         tratamiento_id: int,
         tratamiento_data: TratamientoUpdateValidator,
         db: Session = Depends(get_db)):
-    tratamiento = get_tratamiento_or_404(db=db, tratamiento_id=tratamiento_id)
-    return TratamientoModel.update(db=db, obj=tratamiento, data=tratamiento_data.model_dump())
+    return TratamientoController.update(db=db, tratamiento_id=tratamiento_id, data=tratamiento_data)
 
 
 @router.delete(
@@ -73,5 +62,4 @@ def update_tratamiento(
 def delete_tratamiento(
         tratamiento_id: int,
         db: Session = Depends(get_db)):
-    tratamiento = get_tratamiento_or_404(db=db, tratamiento_id=tratamiento_id)
-    TratamientoModel.delete(db=db, obj=tratamiento)
+    TratamientoController.delete(db=db, tratamiento_id=tratamiento_id)
