@@ -3,6 +3,9 @@
 .idea/
 __pycache__/
 
+# Archivos temporales de Excel (se crean al abrir un .xlsx)
+~$*.xlsx
+
 # Claude Code (no subir nada relacionado con Claude)
 .claude/
 CLAUDE.md
