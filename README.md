@@ -81,11 +81,13 @@ clinica_veterinaria/
 │   ├── schema_validator/            # Pydantic validators (input/output)
 │   └── schemas/                     # SQLAlchemy tables (ORM)
 ├── datos_clinica.xlsx               # Sample data to seed the DB
+├── seed.py                          # Loads datos_clinica.xlsx into the DB
 ├── Diagrama-veterinaria.drawio      # Entity-relationship diagram
 ├── main.py                          # Entry point (creates the app and wires routers)
 ├── requirements.txt
 ├── .env.example                     # Environment variables template
-└── PLAN_DE_TRABAJO.md
+├── PLAN_DE_TRABAJO.md
+└── GUIA_DE_ESTUDIO.md               # Study guide for the project presentation
 ```
 
 ---
@@ -250,11 +252,16 @@ pip install -r requirements.txt
 
 # 4. Make sure PostgreSQL is running and the database exists
 
-# 5. Start the server
+# 5. (Optional) Seed the database with the sample data
+python seed.py
+
+# 6. Start the server
 uvicorn main:app --reload
 ```
 
 The app creates the tables automatically on startup (`Base.metadata.create_all` in the `lifespan` of `main.py`).
+
+`seed.py` empties the tables and reloads them with the rows from `datos_clinica.xlsx` (parents first, keeping the original ids). Run it whenever you want a clean, consistent dataset — for example before a demo.
 
 Check the DB connection: `GET http://localhost:8000/health-db`
 
@@ -276,6 +283,6 @@ Pending work is detailed in **[`PLAN_DE_TRABAJO.md`](./PLAN_DE_TRABAJO.md)** and
 
 1. ~~**Complete CRUD** (GET, GET/{id}, PUT, DELETE) for the 7 entities.~~ ✅ Done.
 2. **Error handling**: 404 is done across all entities; foreign-key validation (e.g. creating a pet with a non-existent `propietario_id`) is still pending.
-3. **Data seeding** from `datos_clinica.xlsx`.
+3. ~~**Data seeding** from `datos_clinica.xlsx`.~~ ✅ Done (`seed.py`).
 4. **Tests** with pytest + TestClient.
 5. ~~**README** for installation and usage.~~ ✅ Done (this file).

@@ -17,7 +17,7 @@ API REST con **FastAPI + SQLAlchemy + PostgreSQL**. Arquitectura por capas:
 | CRUD completo (7 entidades) | ✅ Hecho |
 | Manejo de 404 | ✅ Hecho |
 | Validación de claves foráneas (400) | ❌ Falta |
-| Carga de datos desde `datos_clinica.xlsx` | ❌ Falta |
+| Carga de datos desde `datos_clinica.xlsx` | ✅ Hecho (`seed.py`) |
 | Tests (pytest) | ❌ Falta |
 | README / documentación | ✅ Hecho (revisar al cierre) |
 
@@ -51,9 +51,11 @@ Por cada una de las 7 entidades, añadir en las 2 capas (model → router):
 
 ## Fase 3 — Carga de datos desde Excel
 
-- [ ] Añadir `openpyxl` (o `pandas`) a `requirements.txt`.
-- [ ] Crear script de seed que lea `datos_clinica.xlsx` y puebla la BD respetando el orden de dependencias (propietarios → mascotas → historias/citas...).
-- [ ] Documentar cómo ejecutarlo.
+- [x] Añadir `openpyxl` a `requirements.txt`.
+- [x] Crear script de seed que lea `datos_clinica.xlsx` y puebla la BD respetando el orden de dependencias (propietarios → mascotas → historias/citas...).
+- [x] Documentar cómo ejecutarlo.
+
+> ✅ Fase 3 completada: `seed.py` vacía y recarga las 7 tablas con los datos del Excel (padres antes que hijas, conservando los id). Ejecutar con `python seed.py`.
 
 ## Fase 4 — Tests
 
@@ -71,8 +73,8 @@ Por cada una de las 7 entidades, añadir en las 2 capas (model → router):
 
 ## Orden sugerido
 
-1. **Fase 1** (CRUD) — es el grueso y lo que da valor a la API.
-2. **Fase 2** (errores) — se puede ir haciendo junto con la Fase 1.
-3. **Fase 3** (Excel) — para tener datos reales con los que probar.
+1. ~~**Fase 1** (CRUD) — es el grueso y lo que da valor a la API.~~ ✅
+2. **Fase 2** (errores) — validación de claves foráneas (400) pendiente.
+3. ~~**Fase 3** (Excel) — para tener datos reales con los que probar.~~ ✅
 4. **Fase 4** (tests).
 5. **Fase 5** (README y cierre).
