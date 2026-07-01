@@ -12,13 +12,6 @@ from app.routers.mascota_router import router as mascota_router
 from app.routers.historia_clinica_router import router as historia_clinica_router
 from app.routers.cita_router import router as cita_router
 from app.routers.mascota_tratamiento_router import router as mascota_tratamiento_router
-from app.schemas.propietario_schema import PropietarioSchema
-from app.schemas.veterinario_schema import VeterinarioSchema
-from app.schemas.tratamiento_schema import TratamientoSchema
-from app.schemas.mascota_schema import MascotaSchema
-from app.schemas.historia_clinica_schema import HistoriaClinicaSchema
-from app.schemas.cita_schema import CitaSchema
-from app.schemas.mascota_tratamiento_schema import MascotaTratamientoSchema
 
 
 @asynccontextmanager

@@ -13,6 +13,8 @@ router = APIRouter(
     prefix="/propietarios",
     tags=["Propietarios"]
 )
+
+
 @router.post(
     "/",
     response_model=PropietarioResponseValidator,
