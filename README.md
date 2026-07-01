@@ -38,10 +38,13 @@ The project follows a **layered architecture** with a single responsibility per 
 HTTP Client
     │
     ▼
-Router          → defines the route + HTTP method (endpoint), orchestrates
-    │              the operation and handles errors (404)
+Router          → defines the route and HTTP method (endpoint)
+    │
     ▼
 Validator       → validates/serializes input and output data (Pydantic)
+    │
+    ▼
+Controller      → orchestrates the operation and handles errors (404)
     │
     ▼
 Model           → runs the operation against the DB
@@ -55,8 +58,9 @@ PostgreSQL
 
 ### What each layer does
 
-- **Router** (`app/routers/`): exposes the HTTP endpoints, validates with Pydantic, calls the model and raises `HTTPException` (404) when needed. In FastAPI the route handler already plays the controller role, so there is no separate controller layer.
+- **Router** (`app/routers/`): exposes the HTTP endpoints and delegates to the controller. Contains no business logic.
 - **Validator** (`app/schema_validator/`): Pydantic models defining what data comes in (`Create` / `Update`) and what data goes out (`Response`).
+- **Controller** (`app/controllers/`): orchestrates the operation; receives the validated data, calls the model and raises `HTTPException` (404) when an id does not exist.
 - **Model** (`app/models/`): talks to the database. The generic CRUD (`create`, `get_all`, `get_by_id`, `update`, `delete`) lives in `BaseModel` (`base_model.py`); each entity model just inherits from it and declares its `schema`.
 - **Schema** (`app/schemas/`): SQLAlchemy classes representing the tables.
 
@@ -69,10 +73,11 @@ clinica_veterinaria/
 ├── app/
 │   ├── config/
 │   │   └── settings.py              # Configuration (reads .env)
+│   ├── controllers/                 # Orchestration + error handling per entity
 │   ├── database/
 │   │   └── db_connection.py         # Engine, session and Base
 │   ├── models/                      # Database operations (base_model.py = generic CRUD)
-│   ├── routers/                     # HTTP endpoints + orchestration
+│   ├── routers/                     # HTTP endpoints (delegate to controllers)
 │   ├── schema_validator/            # Pydantic validators (input/output)
 │   └── schemas/                     # SQLAlchemy tables (ORM)
 ├── datos_clinica.xlsx               # Sample data to seed the DB

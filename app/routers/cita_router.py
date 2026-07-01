@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from app.controllers.cita_controller import CitaController
 from app.database.db_connection import get_db
-from app.models.cita_model import CitaModel
 from app.schema_validator.cita_validator import (
     CitaCreateValidator,
     CitaUpdateValidator,
@@ -15,16 +15,6 @@ router = APIRouter(
 )
 
 
-def get_cita_or_404(db: Session, cita_id: int):
-    cita = CitaModel.get_by_id(db=db, id_=cita_id)
-    if cita is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Cita con id {cita_id} no encontrada"
-        )
-    return cita
-
-
 @router.post(
     "/",
     response_model=CitaResponseValidator,
@@ -33,7 +23,7 @@ def get_cita_or_404(db: Session, cita_id: int):
 def create_cita(
         cita_data: CitaCreateValidator,
         db: Session = Depends(get_db)):
-    return CitaModel.create(db=db, data=cita_data.model_dump())
+    return CitaController.create(db=db, data=cita_data)
 
 
 @router.get(
@@ -41,7 +31,7 @@ def create_cita(
     response_model=list[CitaResponseValidator],
 )
 def get_citas(db: Session = Depends(get_db)):
-    return CitaModel.get_all(db=db)
+    return CitaController.get_all(db=db)
 
 
 @router.get(
@@ -51,7 +41,7 @@ def get_citas(db: Session = Depends(get_db)):
 def get_cita(
         cita_id: int,
         db: Session = Depends(get_db)):
-    return get_cita_or_404(db=db, cita_id=cita_id)
+    return CitaController.get_by_id(db=db, cita_id=cita_id)
 
 
 @router.put(
@@ -62,8 +52,7 @@ def update_cita(
         cita_id: int,
         cita_data: CitaUpdateValidator,
         db: Session = Depends(get_db)):
-    cita = get_cita_or_404(db=db, cita_id=cita_id)
-    return CitaModel.update(db=db, obj=cita, data=cita_data.model_dump())
+    return CitaController.update(db=db, cita_id=cita_id, data=cita_data)
 
 
 @router.delete(
@@ -73,5 +62,4 @@ def update_cita(
 def delete_cita(
         cita_id: int,
         db: Session = Depends(get_db)):
-    cita = get_cita_or_404(db=db, cita_id=cita_id)
-    CitaModel.delete(db=db, obj=cita)
+    CitaController.delete(db=db, cita_id=cita_id)

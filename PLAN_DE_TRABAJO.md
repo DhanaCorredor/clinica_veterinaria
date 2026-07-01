@@ -1,7 +1,7 @@
 # Plan de trabajo — API Clínica Veterinaria
 
 API REST con **FastAPI + SQLAlchemy + PostgreSQL**. Arquitectura por capas:
-`router → model → schema (SQLAlchemy)` + validadores Pydantic. En FastAPI el router ya cumple el rol de controller, así que no hay capa controller separada.
+`router → controller → model → schema (SQLAlchemy)` + validadores Pydantic. El CRUD genérico vive en `BaseModel`.
 
 ## Estado actual
 
