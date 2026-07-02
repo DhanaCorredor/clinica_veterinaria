@@ -1,4 +1,3 @@
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.propietario_model import PropietarioModel
@@ -19,13 +18,7 @@ class PropietarioController:
 
     @staticmethod
     def get_by_id(db: Session, propietario_id: int):
-        propietario = PropietarioModel.get_by_id(db=db, id_=propietario_id)
-        if propietario is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Propietario con id {propietario_id} no encontrado",
-            )
-        return propietario
+        return PropietarioModel.get_by_id(db=db, id_=propietario_id)
 
     @staticmethod
     def update(db: Session, propietario_id: int, data: PropietarioUpdateValidator):

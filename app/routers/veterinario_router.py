@@ -57,7 +57,6 @@ def update_veterinario(
 
 @router.delete(
     "/{veterinario_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_veterinario(
         veterinario_id: int,

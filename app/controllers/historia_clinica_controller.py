@@ -1,4 +1,3 @@
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.historia_clinica_model import HistoriaClinicaModel
@@ -19,13 +18,7 @@ class HistoriaClinicaController:
 
     @staticmethod
     def get_by_id(db: Session, historia_id: int):
-        historia = HistoriaClinicaModel.get_by_id(db=db, id_=historia_id)
-        if historia is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Historia clinica con id {historia_id} no encontrada",
-            )
-        return historia
+        return HistoriaClinicaModel.get_by_id(db=db, id_=historia_id)
 
     @staticmethod
     def update(db: Session, historia_id: int, data: HistoriaClinicaUpdateValidator):

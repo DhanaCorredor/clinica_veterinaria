@@ -1,4 +1,3 @@
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.mascota_model import MascotaModel
@@ -19,13 +18,7 @@ class MascotaController:
 
     @staticmethod
     def get_by_id(db: Session, mascota_id: int):
-        mascota = MascotaModel.get_by_id(db=db, id_=mascota_id)
-        if mascota is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Mascota con id {mascota_id} no encontrada",
-            )
-        return mascota
+        return MascotaModel.get_by_id(db=db, id_=mascota_id)
 
     @staticmethod
     def update(db: Session, mascota_id: int, data: MascotaUpdateValidator):

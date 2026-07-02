@@ -1,4 +1,3 @@
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.veterinario_model import VeterinarioModel
@@ -19,13 +18,7 @@ class VeterinarioController:
 
     @staticmethod
     def get_by_id(db: Session, veterinario_id: int):
-        veterinario = VeterinarioModel.get_by_id(db=db, id_=veterinario_id)
-        if veterinario is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Veterinario con id {veterinario_id} no encontrado",
-            )
-        return veterinario
+        return VeterinarioModel.get_by_id(db=db, id_=veterinario_id)
 
     @staticmethod
     def update(db: Session, veterinario_id: int, data: VeterinarioUpdateValidator):

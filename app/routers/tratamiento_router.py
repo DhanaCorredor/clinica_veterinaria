@@ -57,7 +57,6 @@ def update_tratamiento(
 
 @router.delete(
     "/{tratamiento_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_tratamiento(
         tratamiento_id: int,

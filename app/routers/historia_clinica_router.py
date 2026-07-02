@@ -57,7 +57,6 @@ def update_historia_clinica(
 
 @router.delete(
     "/{historia_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_historia_clinica(
         historia_id: int,

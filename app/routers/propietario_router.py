@@ -57,7 +57,6 @@ def update_propietario(
 
 @router.delete(
     "/{propietario_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_propietario(
         propietario_id: int,

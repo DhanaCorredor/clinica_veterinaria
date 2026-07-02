@@ -1,4 +1,3 @@
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.cita_model import CitaModel
@@ -19,13 +18,7 @@ class CitaController:
 
     @staticmethod
     def get_by_id(db: Session, cita_id: int):
-        cita = CitaModel.get_by_id(db=db, id_=cita_id)
-        if cita is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Cita con id {cita_id} no encontrada",
-            )
-        return cita
+        return CitaModel.get_by_id(db=db, id_=cita_id)
 
     @staticmethod
     def update(db: Session, cita_id: int, data: CitaUpdateValidator):

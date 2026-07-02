@@ -57,7 +57,6 @@ def update_registro(
 
 @router.delete(
     "/{registro_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_registro(
         registro_id: int,

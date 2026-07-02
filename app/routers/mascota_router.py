@@ -57,7 +57,6 @@ def update_mascota(
 
 @router.delete(
     "/{mascota_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_mascota(
         mascota_id: int,

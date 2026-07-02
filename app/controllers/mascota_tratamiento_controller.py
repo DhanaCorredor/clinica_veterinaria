@@ -1,4 +1,3 @@
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.mascota_tratamiento_model import MascotaTratamientoModel
@@ -19,13 +18,7 @@ class MascotaTratamientoController:
 
     @staticmethod
     def get_by_id(db: Session, registro_id: int):
-        registro = MascotaTratamientoModel.get_by_id(db=db, id_=registro_id)
-        if registro is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Registro mascota-tratamiento con id {registro_id} no encontrado",
-            )
-        return registro
+        return MascotaTratamientoModel.get_by_id(db=db, id_=registro_id)
 
     @staticmethod
     def update(db: Session, registro_id: int, data: MascotaTratamientoUpdateValidator):
